@@ -1,0 +1,26 @@
+{
+    "name": "LCARS",
+    "version": "0.0.1",
+    "description": "A simple multiplayer card game using Node.js and Socket.io",
+    "main": "server.js",
+    "scripts": {
+      "start": "node server.js",
+      "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [
+      "nodejs",
+      "socket.io",
+      "card-game",
+      "multiplayer"
+    ],
+    "author": "Pazuzu",
+    "license": "MIT",
+    "dependencies": {
+      "express": "^4.18.2",
+      "socket.io": "^4.7.2"
+    },
+    "engines": {
+      "node": ">=18.0.0"
+    }
+  }
+  
