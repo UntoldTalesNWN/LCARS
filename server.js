@@ -10,6 +10,9 @@ const io = new Server(server);
 
 const PORT = process.env.PORT || 3000;
 
+// Sample deck of cards (simple numbered cards for demonstration)
+let cardDeck = Array.from({ length: 20 }, (_, i) => `Card ${i + 1}`);
+
 // Serve static files from the "public" directory
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -18,15 +21,24 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Example socket.io setup (you can adjust this to match your game's logic)
+// Handle socket connections
 io.on('connection', (socket) => {
   console.log('A user connected:', socket.id);
 
-  // Example event listener for player actions (adjust as needed)
-  socket.on('playerAction', (action) => {
-    console.log('Player action received:', action);
-    // Handle player action, update game state, etc.
-    io.emit('updateGameState', { /* updated game state here */ });
+  // Handle drawing a card
+  socket.on('drawCard', () => {
+    if (cardDeck.length > 0) {
+      const drawnCard = cardDeck.pop(); // Draw the top card from the deck
+      socket.emit('cardDrawn', drawnCard); // Send the drawn card to the client
+    } else {
+      socket.emit('deckEmpty'); // Notify if the deck is empty
+    }
+  });
+
+  // Handle placing a card on the grid
+  socket.on('placeCard', ({ card, index }) => {
+    // Broadcast the placed card and position to all clients
+    io.emit('cardPlaced', { card, index });
   });
 
   socket.on('disconnect', () => {
