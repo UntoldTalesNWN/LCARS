@@ -27,17 +27,20 @@ io.on('connection', (socket) => {
 
   // Handle drawing a card
   socket.on('drawCard', () => {
+    console.log(`Draw card request from ${socket.id}`);
     if (cardDeck.length > 0) {
       const drawnCard = cardDeck.pop(); // Draw the top card from the deck
+      console.log(`Card drawn: ${drawnCard}`);
       socket.emit('cardDrawn', drawnCard); // Send the drawn card to the client
     } else {
+      console.log('Deck is empty');
       socket.emit('deckEmpty'); // Notify if the deck is empty
     }
   });
 
   // Handle placing a card on the grid
   socket.on('placeCard', ({ card, index }) => {
-    // Broadcast the placed card and position to all clients
+    console.log(`Placing card ${card} at index ${index} from ${socket.id}`);
     io.emit('cardPlaced', { card, index });
   });
 
