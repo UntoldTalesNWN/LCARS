@@ -1,20 +1,19 @@
+<!-- public/index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Card Game</title>
-  <style>
-    body { font-family: Arial, sans-serif; }
-    #gameArea { margin: 20px; }
-  </style>
+  <link rel="stylesheet" href="styles.css"> <!-- Optional: Link to CSS -->
 </head>
 <body>
-  <h1>Online Card Game</h1>
-  <button id="startGameBtn">Start Game</button>
-  <div id="gameArea"></div>
+  <h1>Welcome to the Card Game</h1>
+  <button onclick="playerAction('drawCard')">Draw Card</button> <!-- Example Button -->
 
+  <!-- Load Socket.io client-side library from CDN -->
   <script src="/socket.io/socket.io.js"></script>
-  <script src="main.js"></script>
+  <script src="main.js"></script> <!-- Link to your main.js -->
 </body>
 </html>
