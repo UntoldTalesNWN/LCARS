@@ -92,9 +92,3 @@ function updateHandDisplay() {
 
 // Create a 5x5 grid (adjust the size if needed)
 createGrid(5);
-
-// Button to draw a card
-const drawButton = document.createElement('button');
-drawButton.textContent = 'Draw Card';
-drawButton.onclick = drawCard;
-document.body.insertBefore(drawButton, gameBoard); // Place draw button above the grid
