@@ -17,3 +17,23 @@ body {
     margin-top: 20px;
   }
   
+  .grid-board {
+    display: grid;
+    grid-template-columns: repeat(5, 60px); /* Creates a 5-column grid */
+    grid-template-rows: repeat(5, 60px);    /* Creates a 5-row grid */
+    gap: 5px;                               /* Space between grid cells */
+    margin: 20px auto;
+    max-width: 300px;
+  }
+  
+  .grid-cell {
+    width: 60px;
+    height: 60px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px; /* Adjust based on your game pieces */
+  }
+  

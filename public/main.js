@@ -23,3 +23,32 @@ socket.on('updateGameState', (gameState) => {
 socket.on('disconnect', () => {
   console.log('Disconnected from server');
 });
+
+// Create a grid game board
+const gameBoard = document.getElementById('game-board');
+
+function createGrid(size) {
+  for (let i = 0; i < size * size; i++) {
+    const cell = document.createElement('div');
+    cell.classList.add('grid-cell');
+    cell.dataset.index = i; // Optional: Store index or ID for reference
+
+    // Add event listener for interaction
+    cell.addEventListener('click', () => handleCellClick(i, cell));
+
+    gameBoard.appendChild(cell);
+  }
+}
+
+// Handle cell click events
+function handleCellClick(index, cell) {
+  console.log(`Cell ${index} clicked`);
+  // Example: Toggle cell state or perform an action
+  cell.style.backgroundColor = cell.style.backgroundColor === 'lightblue' ? '#fff' : 'lightblue';
+
+  // Emit an action related to the grid, like placing a card
+  socket.emit('cellClick', { index });
+}
+
+// Create a 5x5 grid (adjust the size if needed)
+createGrid(5);
