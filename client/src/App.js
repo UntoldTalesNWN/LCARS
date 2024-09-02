@@ -114,4 +114,6 @@ function App() {
             </div>
         </div>  // Properly closed div tag
     )
-};
+}
+
+export default App; 
