@@ -1,6 +1,28 @@
 {
+  "name": "lcars",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "boardgame.io": "^0.50.2"
+  }
+}
+
+{
   "scripts": {
     "start": "parcel index.html --open"
   },
   "browserslist": "defaults and supports async-functions"
+}
+
+{
+  "scripts": {
+    "build": "parcel build index.html --out-dir build",
+  }
 }
