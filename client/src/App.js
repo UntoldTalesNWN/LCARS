@@ -111,4 +111,7 @@ function App() {
                         <button onClick={() => flipCard(card)}>{card.faceDown ? 'Face Up' : 'Face Down'}</button>
                     </div>
                 ))}
-            </
+            </div>
+        </div>  // Properly closed div tag
+    )
+};
