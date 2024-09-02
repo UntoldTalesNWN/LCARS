@@ -1,7 +1,7 @@
-// server.js
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
+const path = require('path');
 
 const app = express();
 const server = http.createServer(app);
@@ -9,22 +9,21 @@ const io = new Server(server);
 
 const PORT = process.env.PORT || 3000;
 
-app.use(express.static('public')); // Serve frontend files
+// Serve static files from the React app
+app.use(express.static(path.join(__dirname, '../client/build')));
 
-let rooms = {};
-
+// Socket.io setup
 io.on('connection', (socket) => {
     console.log('A user connected:', socket.id);
 
     socket.on('createRoom', (roomId) => {
-        rooms[roomId] = { players: [socket.id], gameState: {} };
         socket.join(roomId);
         io.to(roomId).emit('roomCreated', roomId);
     });
 
     socket.on('joinRoom', (roomId) => {
-        if (rooms[roomId] && rooms[roomId].players.length < 2) {
-            rooms[roomId].players.push(socket.id);
+        const room = io.sockets.adapter.rooms.get(roomId);
+        if (room && room.size <= 2) {
             socket.join(roomId);
             io.to(roomId).emit('playerJoined', socket.id);
         } else {
@@ -37,16 +36,17 @@ io.on('connection', (socket) => {
     });
 
     socket.on('playCard', (roomId, card, position) => {
-        // Update the game state
-        rooms[roomId].gameState[card.id] = { ...card, position };
-        io.to(roomId).emit('cardPlayed', rooms[roomId].gameState);
+        io.to(roomId).emit('cardPlayed', { [card.id]: { ...card, position } });
     });
 
     socket.on('disconnect', () => {
         console.log('A user disconnected:', socket.id);
-        // Handle player disconnection
-        // Cleanup rooms, notify other players, etc.
     });
+});
+
+// Catch-all handler to serve the React app
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
 });
 
 server.listen(PORT, () => {
