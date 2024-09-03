@@ -13,7 +13,7 @@ const cardImages = [
     { id: 6, src: '/images/cards/card6.png', name: 'Card 6' },
     { id: 7, src: '/images/cards/card7.png', name: 'Card 7' },
     // Add more cards as needed
-  ];
+];
 
 function App() {
     const [roomId, setRoomId] = useState('');
@@ -21,7 +21,6 @@ function App() {
     const [message, setMessage] = useState('');
     const [chat, setChat] = useState([]);
     const [hand, setHand] = useState([]);
-    const [cards, setCards] = useState(cardImages);
 
     useEffect(() => {
         socket.on('roomCreated', (roomId) => {
@@ -39,6 +38,14 @@ function App() {
         socket.on('cardPlayed', (gameState) => {
             setGameState(gameState);
         });
+
+        // Clean up on component unmount
+        return () => {
+            socket.off('roomCreated');
+            socket.off('playerJoined');
+            socket.off('receiveMessage');
+            socket.off('cardPlayed');
+        };
     }, []);
 
     const createRoom = () => {
@@ -57,53 +64,74 @@ function App() {
     };
 
     const drawCard = () => {
-        const newCard = { id: Math.random(), image: 'card.png', rotation: 0, faceDown: false };
+        const newCard = {
+            id: Math.random(),
+            src: cardImages[Math.floor(Math.random() * cardImages.length)].src, // Random card from available images
+            name: 'New Card',
+            rotation: 0,
+            faceDown: false,
+            flipped: false
+        };
         setHand([...hand, newCard]);
     };
 
     const playCard = (card, position) => {
-        socket.emit('playCard', roomId, card, position);
+        socket.emit('playCard', roomId, { ...card, position });
     };
 
     const rotateCard = (card, direction) => {
-        const newCards = [...cards];
-        newCards[index].rotation = (newCards[index].rotation || 0) + (direction === 'clockwise' ? 90 : -90);
-        setCards(newCards);
+        setHand(hand.map(c => 
+            c.id === card.id 
+                ? { ...c, rotation: (c.rotation || 0) + (direction === 'clockwise' ? 90 : -90) } 
+                : c
+        ));
     };
 
     const flipCard = (card) => {
-        const newCards = [...cards];
-        newCards[index].flipped = !newCards[index].flipped;
-        setCards(newCards);
+        setHand(hand.map(c => 
+            c.id === card.id 
+                ? { ...c, flipped: !c.flipped } 
+                : c
+        ));
     };
 
     return (
         <div className="App">
             <div className="lobby">
                 <button onClick={createRoom}>Create Room</button>
-                <input type="text" value={roomId} onChange={(e) => setRoomId(e.target.value)} placeholder="Room ID" />
+                <input
+                    type="text"
+                    value={roomId}
+                    onChange={(e) => setRoomId(e.target.value)}
+                    placeholder="Room ID"
+                />
                 <button onClick={joinRoom}>Join Room</button>
             </div>
-            
+
             <div className="chat">
                 <div className="chat-messages">
                     {chat.map((msg, idx) => <div key={idx}>{msg}</div>)}
                 </div>
-                <input type="text" value={message} onChange={(e) => setMessage(e.target.value)} placeholder="Message" />
+                <input
+                    type="text"
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    placeholder="Message"
+                />
                 <button onClick={sendMessage}>Send</button>
             </div>
 
             <div className="game-board">
-                {Object.values(gameState).map(card => (
+                {Object.values(gameState).map((card) => (
                     <img
                         key={card.id}
                         src={card.flipped ? '/images/cards/back.png' : card.src}
                         alt="Card"
                         style={{
                             position: 'absolute',
-                            top: card.position.y,
-                            left: card.position.x,
-                            transform: `rotate(${card.rotation}deg)`,
+                            top: card.position?.y || 0,
+                            left: card.position?.x || 0,
+                            transform: `rotate(${card.rotation || 0}deg)`,
                             visibility: card.faceDown ? 'hidden' : 'visible'
                         }}
                     />
@@ -112,23 +140,24 @@ function App() {
 
             <div className="hand">
                 <button onClick={drawCard}>Draw Card</button>
-                {hand.map(card => (
+                {hand.map((card) => (
                     <div key={card.id}>
                         <img
                             src={card.flipped ? '/images/cards/back.png' : card.src}
                             alt={card.name}
                             style={{ transform: `rotate(${card.rotation || 0}deg)` }}
                             className="card-image"
-                            onClick={() => flipCard(index)}
+                            onClick={() => flipCard(card)}
                         />
                         <button onClick={() => rotateCard(card, 'clockwise')}>Rotate Clockwise</button>
                         <button onClick={() => rotateCard(card, 'counterclockwise')}>Rotate Counter</button>
                         <button onClick={() => flipCard(card)}>{card.faceDown ? 'Face Up' : 'Face Down'}</button>
+                        <button onClick={() => playCard(card, { x: 100, y: 100 })}>Play Card</button> {/* Example position */}
                     </div>
                 ))}
             </div>
-        </div>  // Properly closed div tag
-    )
+        </div>
+    );
 }
 
-export default App; 
+export default App;
