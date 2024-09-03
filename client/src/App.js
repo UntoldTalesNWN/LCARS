@@ -3,8 +3,6 @@ import io from 'socket.io-client';
 import { useDrag, useDrop } from 'react-dnd';
 import './App.css';
 
-app.use(express.static(__dirname + '/public'));
-
 const socket = io('http://localhost:3000');
 const BASE_URL = process.env.REACT_APP_BASE_URL || 'https://lcars-dab8.onrender.com';
 
