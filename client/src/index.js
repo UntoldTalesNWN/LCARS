@@ -5,6 +5,8 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import App from './App';
 import './index.css';
 
+localStorage.debug = 'socket.io-client:*';
+
 ReactDOM.render(
   <DndProvider backend={HTML5Backend}>
     <App />
