@@ -6,10 +6,10 @@ const path = require('path');
 const app = express();
 const server = http.createServer(app);
 
-// Configure Socket.io with CORS options
+// Set up Socket.io with CORS settings
 const io = new Server(server, {
     cors: {
-        origin: "https://lcars-dab8.onrender.com", // Replace with your frontend URL
+        origin: "https://lcars-dab8.onrender.com", // The URL of your frontend
         methods: ["GET", "POST"]
     }
 });
@@ -19,7 +19,7 @@ const PORT = process.env.PORT || 3000;
 // Serve static files from the React app
 app.use(express.static(path.join(__dirname, '../client/build')));
 
-// Socket.io setup
+// Socket.io event handling
 io.on('connection', (socket) => {
     console.log('A user connected:', socket.id);
 
@@ -56,6 +56,7 @@ app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
 });
 
+// Start the server
 server.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
