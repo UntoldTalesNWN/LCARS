@@ -1,9 +1,9 @@
 {
-  "name": "server",
-  "version": "1.0.0",
-  "main": "server.js",
+  "name": "LCARS",
+  "version": "0.0.1a",
+  "main": "server/server.js",
   "scripts": {
-      "start": "node server.js"
+      "start": "node server/server.js"
   },
   "dependencies": {
       "express": "^4.19.2",
