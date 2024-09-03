@@ -3,10 +3,10 @@ import io from 'socket.io-client';
 import { useDrag, useDrop } from 'react-dnd';
 import './App.css';
 
-localStorage.debug = '*';
+localStorage.debug = '*'; // Enables debug logging for socket.io
 
 const socket = io('https://lcars-wtyx.onrender.com'); // Use your deployed server URL
-const BASE_URL = process.env.REACT_APP_BASE_URL || 'https://lcars-wtyx.onrender.com';
+const BASE_URL = process.env.REACT_APP_BASE_URL || 'https://lcars-wtyx.onrender.com'; // Corrected line 8
 
 const cardImages = [
     { id: 1, src: `${BASE_URL}/images/cards/card1.png`, name: 'Card 1' },
