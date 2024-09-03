@@ -60,3 +60,5 @@ app.get('*', (req, res) => {
 server.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
+
+console.log('Express server started on port %s', server.address().port);
