@@ -3,6 +3,8 @@ import io from 'socket.io-client';
 import { useDrag, useDrop } from 'react-dnd';
 import './App.css';
 
+localStorage.debug = '*';
+
 const socket = io('https://lcars-dab8.onrender.com'); // Use your deployed server URL
 const BASE_URL = process.env.REACT_APP_BASE_URL || 'https://lcars-dab8.onrender.com';
 
