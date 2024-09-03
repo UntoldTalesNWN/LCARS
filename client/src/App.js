@@ -1,19 +1,80 @@
+// src/App.js
 import React, { useEffect, useState } from 'react';
 import io from 'socket.io-client';
+import { useDrag, useDrop } from 'react-dnd';
 import './App.css';
 
 const socket = io('http://localhost:3000');
+const BASE_URL = process.env.REACT_APP_BASE_URL || 'https://lcars-dab8.onrender.com';
 
 const cardImages = [
-    { id: 1, src: '/images/cards/card1.png', name: 'Card 1' },
-    { id: 2, src: '/images/cards/card2.png', name: 'Card 2' },
-    { id: 3, src: '/images/cards/card3.png', name: 'Card 3' },
-    { id: 4, src: '/images/cards/card4.png', name: 'Card 4' },
-    { id: 5, src: '/images/cards/card5.png', name: 'Card 5' },
-    { id: 6, src: '/images/cards/card6.png', name: 'Card 6' },
-    { id: 7, src: '/images/cards/card7.png', name: 'Card 7' },
-    // Add more cards as needed
+    { id: 1, src: `${BASE_URL}/images/cards/card1.png`, name: 'Card 1' },
+    { id: 2, src: `${BASE_URL}/images/cards/card2.png`, name: 'Card 2' },
+    { id: 3, src: `${BASE_URL}/images/cards/card3.png`, name: 'Card 3' },
+    { id: 4, src: `${BASE_URL}/images/cards/card4.png`, name: 'Card 4' },
+    { id: 5, src: `${BASE_URL}/images/cards/card5.png`, name: 'Card 5' },
+    { id: 6, src: `${BASE_URL}/images/cards/card6.png`, name: 'Card 6' },
+    { id: 7, src: `${BASE_URL}/images/cards/card7.png`, name: 'Card 7' },
 ];
+
+const ItemTypes = {
+    CARD: 'card',
+};
+
+function DraggableCard({ card }) {
+    const [{ isDragging }, drag] = useDrag(() => ({
+        type: ItemTypes.CARD,
+        item: { id: card.id, src: card.src, name: card.name },
+        collect: (monitor) => ({
+            isDragging: !!monitor.isDragging(),
+        }),
+    }));
+
+    return (
+        <img
+            ref={drag}
+            src={card.flipped ? `${BASE_URL}/images/cards/back.png` : card.src}
+            alt={card.name}
+            style={{
+                transform: `rotate(${card.rotation || 0}deg)`,
+                opacity: isDragging ? 0.5 : 1,
+                cursor: 'grab',
+            }}
+            className="card-image"
+        />
+    );
+}
+
+function GameBoard({ gameState, onDropCard }) {
+    const [, drop] = useDrop(() => ({
+        accept: ItemTypes.CARD,
+        drop: (item, monitor) => {
+            const offset = monitor.getSourceClientOffset();
+            if (offset) {
+                onDropCard(item, offset);
+            }
+        },
+    }));
+
+    return (
+        <div ref={drop} className="game-board">
+            {Object.values(gameState).map((card) => (
+                <img
+                    key={card.id}
+                    src={card.flipped ? `${BASE_URL}/images/cards/back.png` : card.src}
+                    alt="Card"
+                    style={{
+                        position: 'absolute',
+                        top: card.position?.y || 0,
+                        left: card.position?.x || 0,
+                        transform: `rotate(${card.rotation || 0}deg)`,
+                        visibility: card.faceDown ? 'hidden' : 'visible',
+                    }}
+                />
+            ))}
+        </div>
+    );
+}
 
 function App() {
     const [roomId, setRoomId] = useState('');
@@ -38,14 +99,6 @@ function App() {
         socket.on('cardPlayed', (gameState) => {
             setGameState(gameState);
         });
-
-        // Clean up on component unmount
-        return () => {
-            socket.off('roomCreated');
-            socket.off('playerJoined');
-            socket.off('receiveMessage');
-            socket.off('cardPlayed');
-        };
     }, []);
 
     const createRoom = () => {
@@ -64,35 +117,20 @@ function App() {
     };
 
     const drawCard = () => {
-        const newCard = {
-            id: Math.random(),
-            src: cardImages[Math.floor(Math.random() * cardImages.length)].src, // Random card from available images
-            name: 'New Card',
-            rotation: 0,
-            faceDown: false,
-            flipped: false
+        const randomCard = cardImages[Math.floor(Math.random() * cardImages.length)];
+        setHand([...hand, randomCard]);
+    };
+
+    const handleCardDrop = (card, position) => {
+        const newGameState = {
+            ...gameState,
+            [card.id]: {
+                ...card,
+                position: { x: position.x, y: position.y },
+            },
         };
-        setHand([...hand, newCard]);
-    };
-
-    const playCard = (card, position) => {
-        socket.emit('playCard', roomId, { ...card, position });
-    };
-
-    const rotateCard = (card, direction) => {
-        setHand(hand.map(c => 
-            c.id === card.id 
-                ? { ...c, rotation: (c.rotation || 0) + (direction === 'clockwise' ? 90 : -90) } 
-                : c
-        ));
-    };
-
-    const flipCard = (card) => {
-        setHand(hand.map(c => 
-            c.id === card.id 
-                ? { ...c, flipped: !c.flipped } 
-                : c
-        ));
+        setGameState(newGameState);
+        socket.emit('playCard', roomId, card, position);
     };
 
     return (
@@ -110,7 +148,9 @@ function App() {
 
             <div className="chat">
                 <div className="chat-messages">
-                    {chat.map((msg, idx) => <div key={idx}>{msg}</div>)}
+                    {chat.map((msg, idx) => (
+                        <div key={idx}>{msg}</div>
+                    ))}
                 </div>
                 <input
                     type="text"
@@ -121,39 +161,12 @@ function App() {
                 <button onClick={sendMessage}>Send</button>
             </div>
 
-            <div className="game-board">
-                {Object.values(gameState).map((card) => (
-                    <img
-                        key={card.id}
-                        src={card.flipped ? '/images/cards/back.png' : card.src}
-                        alt="Card"
-                        style={{
-                            position: 'absolute',
-                            top: card.position?.y || 0,
-                            left: card.position?.x || 0,
-                            transform: `rotate(${card.rotation || 0}deg)`,
-                            visibility: card.faceDown ? 'hidden' : 'visible'
-                        }}
-                    />
-                ))}
-            </div>
+            <GameBoard gameState={gameState} onDropCard={handleCardDrop} />
 
             <div className="hand">
                 <button onClick={drawCard}>Draw Card</button>
                 {hand.map((card) => (
-                    <div key={card.id}>
-                        <img
-                            src={card.flipped ? '/images/cards/back.png' : card.src}
-                            alt={card.name}
-                            style={{ transform: `rotate(${card.rotation || 0}deg)` }}
-                            className="card-image"
-                            onClick={() => flipCard(card)}
-                        />
-                        <button onClick={() => rotateCard(card, 'clockwise')}>Rotate Clockwise</button>
-                        <button onClick={() => rotateCard(card, 'counterclockwise')}>Rotate Counter</button>
-                        <button onClick={() => flipCard(card)}>{card.faceDown ? 'Face Up' : 'Face Down'}</button>
-                        <button onClick={() => playCard(card, { x: 100, y: 100 })}>Play Card</button> {/* Example position */}
-                    </div>
+                    <DraggableCard key={card.id} card={card} />
                 ))}
             </div>
         </div>
