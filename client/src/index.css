@@ -1,1 +1,70 @@
-*{margin:0;padding:0;box-sizing:border-box}body{font-family:Arial,sans-serif;background-color:#f0f0f0;color:#333;line-height:1.6}#root,body,html{height:100%}.App{display:flex;flex-direction:column;align-items:center;padding:20px}button{background-color:#007bff;color:#fff;border:none;padding:10px 20px;border-radius:5px;cursor:pointer;font-size:16px;margin:5px}button:hover{background-color:#0056b3}input[type=text]{padding:10px;border:1px solid #ccc;border-radius:5px;font-size:16px;margin:5px}.chat{width:100%;max-width:600px}.chat-messages{border:1px solid #ccc;border-radius:5px;padding:10px;margin-bottom:10px;height:200px;overflow-y:scroll;background-color:#ff}
+/* index.css */
+
+/* Basic reset for margin and padding */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Set a default font for the entire application */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+    color: #333;
+    line-height: 1.6;
+}
+
+/* Ensure the root element takes up full viewport height */
+html, body, #root {
+    height: 100%;
+}
+
+/* Center the application content */
+.App {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+}
+
+/* Style for buttons */
+button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    margin: 5px;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+/* Style for input fields */
+input[type="text"] {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    margin: 5px;
+}
+
+/* Chat section styles */
+.chat {
+    width: 100%;
+    max-width: 600px;
+}
+
+.chat-messages {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 10px;
+    height: 200px;
+    overflow-y: scroll;
+    background-color: #ff
+}
