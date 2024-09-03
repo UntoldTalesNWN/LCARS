@@ -10,7 +10,7 @@ const server = http.createServer(app);
 // Set up Socket.io with CORS settings
 const io = new Server(server, {
     cors: {
-        origin: "https://lcars-wtyx.onrender.com", // Your frontend URL
+        origin: "https://lcars-j17k.onrender.com", // Your frontend URL
         methods: ["GET", "POST"]
     }
 });
