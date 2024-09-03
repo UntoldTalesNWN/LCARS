@@ -2,20 +2,19 @@ const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
 const path = require('path');
-const cors = require('cors'); // Import the CORS package
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server);
+
+// Configure Socket.io with CORS options
+const io = new Server(server, {
+    cors: {
+        origin: "https://lcars-dab8.onrender.com", // Replace with your frontend URL
+        methods: ["GET", "POST"]
+    }
+});
 
 const PORT = process.env.PORT || 3000;
-
-// Set up CORS
-app.use(cors({
-    origin: 'https://lcars-dab8.onrender.com', // Replace with your frontend URL
-    methods: ['GET', 'POST'],
-    allowedHeaders: ['Content-Type']
-}));
 
 // Serve static files from the React app
 app.use(express.static(path.join(__dirname, '../client/build')));
