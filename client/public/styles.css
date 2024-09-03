@@ -1,0 +1,129 @@
+/* General body styles */
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #000;
+    color: #fff;
+}
+
+/* Main app container */
+.App {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+}
+
+/* Lobby styles */
+.lobby {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.lobby button {
+    background-color: #f2c300;
+    border: none;
+    color: #000;
+    padding: 10px 20px;
+    font-size: 16px;
+    margin: 0 5px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.lobby button:hover {
+    background-color: #e0b800;
+}
+
+.lobby input {
+    padding: 10px;
+    font-size: 16px;
+    margin: 0 5px;
+    border-radius: 5px;
+    border: 1px solid #f2c300;
+    color: #000;
+    background-color: #333;
+}
+
+/* Chat styles */
+.chat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 20px 0;
+}
+
+.chat-messages {
+    background-color: #111;
+    border: 1px solid #f2c300;
+    padding: 10px;
+    border-radius: 5px;
+    max-height: 200px;
+    overflow-y: auto;
+    width: 300px;
+    margin-bottom: 10px;
+}
+
+.chat input {
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #f2c300;
+    border-radius: 5px;
+    background-color: #333;
+    color: #fff;
+    width: 100%;
+}
+
+/* Game board styles */
+.game-board {
+    position: relative;
+    width: 600px;
+    height: 400px;
+    border: 2px solid #f2c300;
+    border-radius: 10px;
+    background-color: #222;
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+
+.game-board img {
+    position: absolute;
+    width: 100px;
+    height: 140px;
+    transition: transform 0.3s ease, visibility 0.3s ease;
+}
+
+/* Hand styles */
+.hand {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.hand button {
+    background-color: #f2c300;
+    border: none;
+    color: #000;
+    padding: 10px 20px;
+    font-size: 16px;
+    margin: 0 5px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-bottom: 10px;
+}
+
+.hand button:hover {
+    background-color: #e0b800;
+}
+
+.card-image {
+    margin: 5px;
+    cursor: grab;
+    transition: transform 0.2s ease;
+}
+
+.card-image:active {
+    cursor: grabbing;
+}
