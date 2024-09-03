@@ -11,7 +11,7 @@ const io = new Server(server);
 // Set up Socket.io with CORS settings
 const io = new Server(server, {
     cors: {
-        origin: "https://lcars-dab8.onrender.com", // Your frontend URL
+        origin: "https://lcars-wtyx.onrender.com", // Your frontend URL
         methods: ["GET", "POST"]
     }
 });
