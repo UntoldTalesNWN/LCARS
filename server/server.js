@@ -6,7 +6,6 @@ const cors = require('cors'); // Import the CORS package
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server);
 
 // Set up Socket.io with CORS settings
 const io = new Server(server, {
