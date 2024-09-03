@@ -5,8 +5,8 @@ import './App.css';
 
 localStorage.debug = '*';
 
-const socket = io('https://lcars-wtyx.onrender.com/'); // Use your deployed server URL
-const BASE_URL = process.env.REACT_APP_BASE_URL || 'https://lcars-wtyx.onrender.com/';
+const socket = io('https://lcars-wtyx.onrender.com'); // Use your deployed server URL
+const BASE_URL = process.env.REACT_APP_BASE_URL || 'https://lcars-wtyx.onrender.com';
 
 const cardImages = [
     { id: 1, src: `${BASE_URL}/images/cards/card1.png`, name: 'Card 1' },

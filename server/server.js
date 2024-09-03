@@ -12,7 +12,7 @@ const PORT = process.env.PORT || 3000;
 
 // Set up CORS
 app.use(cors({
-    origin: 'https://lcars-dab8.onrender.com/', // Replace with your frontend URL
+    origin: 'https://lcars-wtyx.onrender.com', // Replace with your frontend URL
     methods: ['GET', 'POST'],
     allowedHeaders: ['Content-Type']
 }));
