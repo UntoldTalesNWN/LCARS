@@ -3,17 +3,8 @@ import io from 'socket.io-client';
 import { useDrag, useDrop } from 'react-dnd';
 import './App.css';
 
-const cors = require('cors'); // Import the CORS package
-
 const socket = io('http://localhost:3000');
 const BASE_URL = process.env.REACT_APP_BASE_URL || 'https://lcars-dab8.onrender.com';
-
-// Set up CORS
-app.use(cors({
-    origin: 'https://lcars-dab8.onrender.com', // Replace with your frontend URL
-    methods: ['GET', 'POST'],
-    allowedHeaders: ['Content-Type']
-}));
 
 const cardImages = [
     { id: 1, src: `${BASE_URL}/images/cards/card1.png`, name: 'Card 1' },
