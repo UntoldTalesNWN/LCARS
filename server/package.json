@@ -1,0 +1,16 @@
+{
+  "name": "LCARS",
+  "version": "0.0.1a",
+  "main": "server/server.js",
+  "scripts": {
+      "start": "node server/server.js"
+  },
+  "dependencies": {
+      "express": "^4.19.2",
+      "socket.io": "^4.7.5"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}
