@@ -12,8 +12,8 @@ const PORT = process.env.PORT || 3000;
 // Serve static files from the React app
 app.use(express.static(path.join(__dirname, '../client/build')));
 
-// Serve additional static assets if needed
-app.use(express.static(path.join(__dirname, 'public')));
+// Serve additional static files if needed
+app.use(express.static(path.join(__dirname, '../client/public')));
 
 // Socket.io setup
 io.on('connection', (socket) => {
