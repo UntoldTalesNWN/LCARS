@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import io from 'socket.io-client';
 import { useDrag, useDrop } from 'react-dnd';
+import { DndProvider, HTML5Backend } from 'react-dnd-html5-backend';
 import './App.css';
 
 const socket = io('https://lcars-j17k.onrender.com'); // Your deployed server URL
@@ -38,7 +39,7 @@ const DraggableCard = ({ card, updateCardPosition }) => {
                 });
             }
         },
-    }), [card, updateCardPosition]); // Adding dependencies to ensure proper updates
+    }), [card, updateCardPosition]);
 
     return (
         <img
@@ -70,7 +71,7 @@ function GameBoard({ gameState, updateCardPosition }) {
                 console.error('Drop offset is undefined', { offset });
             }
         },
-    }), [updateCardPosition]); // Adding dependencies to ensure proper updates
+    }), [updateCardPosition]);
 
     return (
         <div ref={drop} className="game-board" style={{ position: 'relative', width: '100%', height: '100%' }}>
@@ -105,7 +106,6 @@ function App() {
             setGameState(gameState);
         });
 
-        // Cleanup socket listeners on component unmount
         return () => {
             socket.off('roomCreated');
             socket.off('playerJoined');
@@ -152,42 +152,44 @@ function App() {
     };
 
     return (
-        <div className="App">
-            <div className="lobby">
-                <button onClick={createRoom}>Create Room</button>
-                <input
-                    type="text"
-                    value={roomId}
-                    onChange={(e) => setRoomId(e.target.value)}
-                    placeholder="Room ID"
-                />
-                <button onClick={joinRoom}>Join Room</button>
-            </div>
+        <DndProvider backend={HTML5Backend}>
+            <div className="App">
+                <div className="lobby">
+                    <button onClick={createRoom}>Create Room</button>
+                    <input
+                        type="text"
+                        value={roomId}
+                        onChange={(e) => setRoomId(e.target.value)}
+                        placeholder="Room ID"
+                    />
+                    <button onClick={joinRoom}>Join Room</button>
+                </div>
 
-            <div className="chat">
-                <div className="chat-messages">
-                    {chat.map((msg, idx) => (
-                        <div key={idx}>{msg}</div>
+                <div className="chat">
+                    <div className="chat-messages">
+                        {chat.map((msg, idx) => (
+                            <div key={idx}>{msg}</div>
+                        ))}
+                    </div>
+                    <input
+                        type="text"
+                        value={message}
+                        onChange={(e) => setMessage(e.target.value)}
+                        placeholder="Message"
+                    />
+                    <button onClick={sendMessage}>Send</button>
+                </div>
+
+                <GameBoard gameState={gameState} updateCardPosition={updateCardPosition} />
+
+                <div className="hand">
+                    <button onClick={drawCard}>Draw Card</button>
+                    {hand.map((card) => (
+                        <DraggableCard key={card.id} card={card} updateCardPosition={updateCardPosition} />
                     ))}
                 </div>
-                <input
-                    type="text"
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                    placeholder="Message"
-                />
-                <button onClick={sendMessage}>Send</button>
             </div>
-
-            <GameBoard gameState={gameState} updateCardPosition={updateCardPosition} />
-
-            <div className="hand">
-                <button onClick={drawCard}>Draw Card</button>
-                {hand.map((card) => (
-                    <DraggableCard key={card.id} card={card} updateCardPosition={updateCardPosition} />
-                ))}
-            </div>
-        </div>
+        </DndProvider>
     );
 }
 
