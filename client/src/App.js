@@ -7,7 +7,6 @@ localStorage.debug = '*'; // Enables debug logging for socket.io
 
 const socket = io('https://lcars-j17k.onrender.com'); // Use your deployed server URL
 const BASE_URL = process.env.REACT_APP_BASE_URL || 'https://lcars-j17k.onrender.com'; // Corrected line 8
-socket.current = io('https://lcars-j17k.onrender.com');
 
 const cardImages = [
     { id: 1, src: `${BASE_URL}/images/cards/card1.png`, name: 'Card 1' },
@@ -25,15 +24,21 @@ const ItemTypes = {
 
 const DraggableCard = ({ card, updateCardPosition }) => {
     const [{ isDragging }, drag] = useDrag(() => ({
-        type: 'card',
+        type: ItemTypes.CARD,
         item: { id: card.id, card },
         collect: (monitor) => ({
             isDragging: !!monitor.isDragging(),
         }),
         end: (item, monitor) => {
+            if (!monitor.didDrop()) return; // Only proceed if drop was successful
             const offset = monitor.getSourceClientOffset();
-            if (offset) {
-                updateCardPosition(card.id, offset); // Update card position after drag ends
+            if (offset && typeof updateCardPosition === 'function') {
+                updateCardPosition(item.id, offset);
+            } else {
+                console.error('updateCardPosition is not a function or offset is undefined', {
+                    updateCardPosition,
+                    offset,
+                });
             }
         },
     }));
@@ -59,7 +64,7 @@ const DraggableCard = ({ card, updateCardPosition }) => {
 
 function GameBoard({ gameState, updateCardPosition }) {
     const [, drop] = useDrop(() => ({
-        accept: 'card',
+        accept: ItemTypes.CARD,
         drop: (item, monitor) => {
             const offset = monitor.getSourceClientOffset();
             if (offset) {
@@ -100,6 +105,14 @@ function App() {
         socket.on('cardPlayed', (gameState) => {
             setGameState(gameState);
         });
+
+        // Cleanup socket listeners on component unmount
+        return () => {
+            socket.off('roomCreated');
+            socket.off('playerJoined');
+            socket.off('receiveMessage');
+            socket.off('cardPlayed');
+        };
     }, []);
 
     const createRoom = () => {
@@ -146,7 +159,6 @@ function App() {
         socket.emit('playCard', roomId, newGameState[cardId], position);
     };
 
-
     return (
         <div className="App">
             <div className="lobby">
@@ -175,12 +187,12 @@ function App() {
                 <button onClick={sendMessage}>Send</button>
             </div>
 
-            <GameBoard gameState={gameState} onDropCard={handleCardDrop} />
+            <GameBoard gameState={gameState} updateCardPosition={updateCardPosition} />
 
             <div className="hand">
                 <button onClick={drawCard}>Draw Card</button>
                 {hand.map((card) => (
-                    <DraggableCard key={card.id} card={card} />
+                    <DraggableCard key={card.id} card={card} updateCardPosition={updateCardPosition} />
                 ))}
             </div>
         </div>
