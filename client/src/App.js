@@ -23,13 +23,19 @@ const ItemTypes = {
     CARD: 'card',
 };
 
-function DraggableCard({ card }) {
+const DraggableCard = ({ card, updateCardPosition }) => {
     const [{ isDragging }, drag] = useDrag(() => ({
-        type: ItemTypes.CARD,
-        item: { id: card.id, src: card.src, name: card.name },
+        type: 'card',
+        item: { id: card.id, card },
         collect: (monitor) => ({
             isDragging: !!monitor.isDragging(),
         }),
+        end: (item, monitor) => {
+            const offset = monitor.getSourceClientOffset();
+            if (offset) {
+                updateCardPosition(card.id, offset); // Update card position after drag ends
+            }
+        },
     }));
 
     return (
@@ -38,41 +44,34 @@ function DraggableCard({ card }) {
             src={card.flipped ? `${BASE_URL}/images/cards/back.png` : card.src}
             alt={card.name}
             style={{
+                position: 'absolute',
+                top: card.position?.y || 0,
+                left: card.position?.x || 0,
                 transform: `rotate(${card.rotation || 0}deg)`,
                 opacity: isDragging ? 0.5 : 1,
                 cursor: 'grab',
+                zIndex: isDragging ? 1000 : 'auto',
             }}
             className="card-image"
         />
     );
 }
 
-function GameBoard({ gameState, onDropCard }) {
+function GameBoard({ gameState, updateCardPosition }) {
     const [, drop] = useDrop(() => ({
-        accept: ItemTypes.CARD,
+        accept: 'card',
         drop: (item, monitor) => {
             const offset = monitor.getSourceClientOffset();
             if (offset) {
-                onDropCard(item, offset);
+                updateCardPosition(item.card.id, offset); // Update position when a card is dropped
             }
         },
     }));
 
     return (
-        <div ref={drop} className="game-board">
+        <div ref={drop} className="game-board" style={{ position: 'relative', width: '100%', height: '100%' }}>
             {Object.values(gameState).map((card) => (
-                <img
-                    key={card.id}
-                    src={card.flipped ? `${BASE_URL}/images/cards/back.png` : card.src}
-                    alt="Card"
-                    style={{
-                        position: 'absolute',
-                        top: card.position?.y || 0,
-                        left: card.position?.x || 0,
-                        transform: `rotate(${card.rotation || 0}deg)`,
-                        visibility: card.faceDown ? 'hidden' : 'visible',
-                    }}
-                />
+                <DraggableCard key={card.id} card={card} updateCardPosition={updateCardPosition} />
             ))}
         </div>
     );
@@ -134,6 +133,19 @@ function App() {
         setGameState(newGameState);
         socket.emit('playCard', roomId, card, position);
     };
+
+    const updateCardPosition = (cardId, position) => {
+        const newGameState = {
+            ...gameState,
+            [cardId]: {
+                ...gameState[cardId],
+                position: { x: position.x, y: position.y },
+            },
+        };
+        setGameState(newGameState);
+        socket.emit('playCard', roomId, newGameState[cardId], position);
+    };
+
 
     return (
         <div className="App">
