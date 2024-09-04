@@ -3,10 +3,8 @@ import io from 'socket.io-client';
 import { useDrag, useDrop } from 'react-dnd';
 import './App.css';
 
-localStorage.debug = '*'; // Enables debug logging for socket.io
-
-const socket = io('https://lcars-j17k.onrender.com'); // Use your deployed server URL
-const BASE_URL = process.env.REACT_APP_BASE_URL || 'https://lcars-j17k.onrender.com'; // Corrected line 8
+const socket = io('https://lcars-j17k.onrender.com'); // Your deployed server URL
+const BASE_URL = process.env.REACT_APP_BASE_URL || 'https://lcars-j17k.onrender.com';
 
 const cardImages = [
     { id: 1, src: `${BASE_URL}/images/cards/card1.png`, name: 'Card 1' },
@@ -27,10 +25,9 @@ const DraggableCard = ({ card, updateCardPosition }) => {
         type: ItemTypes.CARD,
         item: { id: card.id, card },
         collect: (monitor) => ({
-            isDragging: !!monitor.isDragging(),
+            isDragging: monitor.isDragging(),
         }),
         end: (item, monitor) => {
-            if (!monitor.didDrop()) return; // Only proceed if drop was successful
             const offset = monitor.getSourceClientOffset();
             if (offset && typeof updateCardPosition === 'function') {
                 updateCardPosition(item.id, offset);
@@ -41,7 +38,7 @@ const DraggableCard = ({ card, updateCardPosition }) => {
                 });
             }
         },
-    }));
+    }), [card, updateCardPosition]); // Adding dependencies to ensure proper updates
 
     return (
         <img
@@ -68,10 +65,12 @@ function GameBoard({ gameState, updateCardPosition }) {
         drop: (item, monitor) => {
             const offset = monitor.getSourceClientOffset();
             if (offset) {
-                updateCardPosition(item.card.id, offset); // Update position when a card is dropped
+                updateCardPosition(item.card.id, offset);
+            } else {
+                console.error('Drop offset is undefined', { offset });
             }
         },
-    }));
+    }), [updateCardPosition]); // Adding dependencies to ensure proper updates
 
     return (
         <div ref={drop} className="game-board" style={{ position: 'relative', width: '100%', height: '100%' }}>
@@ -135,19 +134,12 @@ function App() {
         setHand([...hand, randomCard]);
     };
 
-    const handleCardDrop = (card, position) => {
-        const newGameState = {
-            ...gameState,
-            [card.id]: {
-                ...card,
-                position: { x: position.x, y: position.y },
-            },
-        };
-        setGameState(newGameState);
-        socket.emit('playCard', roomId, card, position);
-    };
-
     const updateCardPosition = (cardId, position) => {
+        if (!position) {
+            console.error('Invalid position object:', position);
+            return;
+        }
+
         const newGameState = {
             ...gameState,
             [cardId]: {
