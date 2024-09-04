@@ -55,7 +55,7 @@ const DraggableCard = ({ card, updateCardPosition }) => {
             className="card-image"
         />
     );
-}
+};
 
 function GameBoard({ gameState, updateCardPosition }) {
     const [, drop] = useDrop(() => ({
